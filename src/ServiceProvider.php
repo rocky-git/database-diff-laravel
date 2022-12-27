@@ -3,9 +3,8 @@
 namespace DatabaseDiff;
 
 use DatabaseDiff\Console\DatabaseDiff;
-use Illuminate\Support\ServiceProvider;
 
-class AdminServiceProvider extends ServiceProvider
+class ServiceProvider extends \Illuminate\Support\ServiceProvider
 {
    
     /**
