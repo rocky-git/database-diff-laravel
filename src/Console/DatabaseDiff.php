@@ -13,7 +13,7 @@ class DatabaseDiff extends Command
      *
      * @var string
      */
-    protected $signature = 'database:diff {dev-connection} {--connection=mysql}';
+    protected $signature = 'database:diff {source-connection} {--connection=mysql}';
 
     /**
      * The console command description.
@@ -29,7 +29,7 @@ class DatabaseDiff extends Command
      */
     public function handle()
     {
-        $diff = new Diff($this->argument('dev-connection'),$this->option('connection'));
+        $diff = new Diff($this->argument('source-connection'),$this->option('connection'));
         $sqlArr = $diff->preview();
         foreach ($sqlArr as $sql){
             $this->warn($sql.';');

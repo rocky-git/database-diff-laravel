@@ -15,26 +15,26 @@ use Illuminate\Support\Facades\Schema;
 class Diff
 {
 
-    protected $devManager;
+    protected $sourceManager;
 
     protected $manager;
 
     protected $sql = [];
 
-    public function __construct($dev_connection,$connection = null)
+    public function __construct($source_connection,$connection = null)
     {
-        $this->devManager = new Manager($dev_connection);
+        $this->sourceManager = new Manager($source_connection);
 
         $this->manager = new Manager($connection ??  DB::getDefaultConnection());
     }
 
     protected function diffTable(){
 
-        $oldTables = $this->devManager->getTables();
+        $oldTables = $this->sourceManager->getTables();
         $tables = $this->manager->getTables();
         $diffTables =  array_diff($oldTables,$tables);
         foreach ($diffTables as $tableName){
-            $table = $this->devManager->getTable($tableName);
+            $table = $this->sourceManager->getTable($tableName);
             $this->sql = array_merge($this->sql,$this->manager->getDoctrineSchemaManager()
                 ->getDatabasePlatform()
                 ->getCreateTableSQL($table));
@@ -43,11 +43,11 @@ class Diff
     }
     protected function diffTableColumn(){
 
-        $tables = $this->devManager->getTables();
+        $tables = $this->sourceManager->getTables();
         foreach ($tables as $tableName){
             $addColumns = [];
             $modifiedColumns = [];
-            $columns = $this->devManager->getTable($tableName)->getColumns();
+            $columns = $this->sourceManager->getTable($tableName)->getColumns();
             foreach ($columns as $column){
                 if($this->manager->getTable($tableName)){
                     if($this->manager->getTable($tableName)->hasColumn($column->getName())){
