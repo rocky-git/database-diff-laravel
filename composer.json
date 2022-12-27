@@ -1,0 +1,34 @@
+{
+    "name": "rockys/database-diff-laravel",
+    "description": "数据库对比差异sql",
+    "license": "MIT",
+    "type": "library",
+    "keywords": [
+        "php",
+        "database",
+        "diff",
+        "laravel"
+    ],
+    "authors": [
+        {
+            "name": "rocky",
+            "email": "631670747@qq.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.4.0",
+        "doctrine/dbal": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "DatabaseDiff\\": "src"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "DatabaseDiff\\ServiceProvider"
+            ]
+        }
+    }
+}
