@@ -87,12 +87,18 @@ class Diff
     
     protected function diffTableIndex($tableName){
         $oldIndexs = [];
-        foreach ($this->sourceManager->getTable($tableName)->getIndexes() as $index){
-            $oldIndexs[] = $index->getName();
+        $table = $this->sourceManager->getTable($tableName);
+        if($table) {
+            foreach ($table->getIndexes() as $index) {
+                $oldIndexs[] = $index->getName();
+            }
         }
         $indexs = [];
-        foreach ($this->manager->getTable($tableName)->getIndexes() as $index){
-            $indexs[] = $index->getName();
+        $table = $this->manager->getTable($tableName);
+        if($table){
+            foreach ($table->getIndexes() as $index){
+                $indexs[] = $index->getName();
+            }
         }
         $indexs = array_diff($oldIndexs, $indexs);
         $diffIndex = [];
