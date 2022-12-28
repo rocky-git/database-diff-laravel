@@ -1,12 +1,14 @@
-
 ### Usage
-对比源 connection 连接名称 test
+生成差异sql文件，对比源 connection 连接名称 deploy
 ```
-php artisan database:diff test
-```
-
-对比源 connection 连接名称 test,指定目标连接名称mysql
-```
-php artisan database:diff test --connection=mysql
+php artisan database:diff deploy
 ```
 
+执行差异sql文件
+```
+php artisan database:diff-run
+```
+执行差异sql文件，指定连接名称 deploy
+```
+php artisan database:diff-run --connection=deploy
+```

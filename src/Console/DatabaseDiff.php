@@ -13,7 +13,7 @@ class DatabaseDiff extends Command
      *
      * @var string
      */
-    protected $signature = 'database:diff {source-connection} {--connection=mysql}';
+    protected $signature = 'database:diff {target-connection}';
 
     /**
      * The console command description.
@@ -29,19 +29,37 @@ class DatabaseDiff extends Command
      */
     public function handle()
     {
-        $diff = new Diff($this->argument('source-connection'),$this->option('connection'));
+        $diff = new Diff($this->argument('target-connection'));
         $sqlArr = $diff->preview();
-        foreach ($sqlArr as $sql){
-            $this->warn($sql.';');
-            $this->newLine();
-        }
         if(empty($sqlArr)){
             $this->output->info('无差异sql');
-        }else if($this->confirm('确认执行当前差异sql？')){
-            if($diff->exec()){
-                $this->output->success('执行成功');
+        }else{
+            $directory = $this->getDirectory();
+            if(!is_dir($directory)){
+                mkdir($directory,0755,true);
+            }
+            $identifier = $diff->getManager()->identifier();
+            $path = $directory.DIRECTORY_SEPARATOR.$identifier.'-'.date('Y_m_d_His').'.sql';
+            $backPath = $path.'.back';
+            $this->clearRepeatFile($identifier);
+            if($this->putFile($path,$sqlArr) && $this->putFile($backPath,$diff->getManager()->backupSql())){
+                $this->output->success("CREATED SUCCESS [{$path}]");
             }
         }
         return Command::SUCCESS;
+    }
+    protected function putFile($path,$sqlArr){
+        return file_put_contents($path,implode(';'.PHP_EOL.PHP_EOL, $sqlArr));
+    }
+
+    protected function clearRepeatFile($identifier){
+        foreach (glob($this->getDirectory().DIRECTORY_SEPARATOR.'*') as $file){
+            if(strpos($file,$identifier) !== false){
+                unlink($file);
+            }
+        }
+    }
+    protected function getDirectory(){
+        return database_path('difference');
     }
 }

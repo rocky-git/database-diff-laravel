@@ -27,8 +27,40 @@ class Manager
             ->getDoctrineSchemaManager();
     }
 
-    public function listTables(){
-        if(empty($this->listTables)){
+    /**
+     * 备份sql
+     * @return array
+     */
+    public function backupSql(){
+        $sql = [];
+        $tables = $this->listTables();
+        foreach ($tables as $table){
+            $sql = array_merge($sql, $this->getDoctrineSchemaManager()
+                ->getDatabasePlatform()
+                ->getCreateTableSQL($table));
+        }
+        return $sql;
+    }
+    /**
+     * 获取唯一标识
+     * @return string
+     */
+    public function identifier(){
+        $tables = $this->listTables();
+        $data = [];
+        foreach ($tables as $table){
+            $columns = $table->getColumns();
+            foreach ($columns as $column){
+                $data[$table->getName()][$column->getName()] = $column->toArray();
+            }
+
+        }
+        return substr(md5(serialize($data)),8,16);
+    }
+
+    public function listTables($cache = false){
+        if(empty($this->listTables) || $cache){
+            $this->listTables = [];
             foreach ($this->doctrineSchemaManager->listTables() as $table){
                 $this->listTables[$table->getName()] = $table;
             }
