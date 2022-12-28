@@ -61,6 +61,7 @@ class Diff
         foreach ($tables as $tableName) {
             $addColumns = [];
             $modifiedColumns = [];
+            $addedIndexes = [];
             $table = $this->sourceManager->getTable($tableName);
             $columns = $table->getColumns();
             foreach ($columns as $column) {
@@ -75,10 +76,10 @@ class Diff
                         //对比新增字段
                         $addColumns[] = $column;
                     }
-                    
+                    $addedIndexes = $this->diffTableIndex($tableName);
                 }
             }
-            $tableDiff = new TableDiff($tableName, $addColumns, $modifiedColumns,[],$this->diffTableIndex($tableName));
+            $tableDiff = new TableDiff($tableName, $addColumns, $modifiedColumns,[],$addedIndexes);
             $this->sql = array_merge($this->sql, $this->manager->getDoctrineSchemaManager()
                 ->getDatabasePlatform()
                 ->getAlterTableSQL($tableDiff));
